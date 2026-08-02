@@ -1,0 +1,19 @@
+# Night Shift Cron Jobs
+# Install: crontab -e, then paste the lines below
+
+# Run coordinator every night at 22:00
+0 22 * * * /opt/nightshift/coordinator.sh >> /var/log/nightshift/cron.log 2>&1
+
+# Generate morning summary at 06:00
+0 6 * * * /opt/nightshift/summary-morning.sh >> /var/log/nightshift/morning.log 2>&1
+
+# --- Alternative schedules ---
+
+# Weekdays only (Mon-Fri)
+# 0 22 * * 1-5 /opt/nightshift/coordinator.sh >> /var/log/nightshift/cron.log 2>&1
+
+# Twice nightly (22:00 and 03:00)
+# 0 22,3 * * * /opt/nightshift/coordinator.sh >> /var/log/nightshift/cron.log 2>&1
+
+# Weekend deep scan (more tasks, more time)
+# 0 20 * * 6 MAX_TASKS=30 MAX_TASK_DURATION=14400 /opt/nightshift/coordinator.sh >> /var/log/nightshift/cron.log 2>&1

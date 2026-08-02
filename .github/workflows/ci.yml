@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+      - name: Run shellcheck
+        run: |
+          shellcheck -S warning config.sh coordinator.sh worker.sh summary.sh summary-morning.sh lesson-generator.sh install.sh
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make scripts executable
+        run: chmod +x *.sh tests/*.sh
+      - name: Run tests
+        run: ./tests/test-nightshift.sh
+
+  language-check:
+    name: English Only
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for non-English strings
+        run: |
+          GERMAN=$(grep -rlE 'ä|ö|ü|ß' --include='*.sh' . || true)
+          if [[ -n "$GERMAN" ]]; then
+            echo "Files with German characters:"
+            echo "$GERMAN"
+            grep -rnE 'ä|ö|ü|ß' --include='*.sh' .
+            exit 1
+          fi
+          echo "All clear — no German strings found."
