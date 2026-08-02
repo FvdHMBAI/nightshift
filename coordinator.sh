@@ -84,12 +84,14 @@ main() {
       *) risk_level="low" ;;
     esac
 
-    local safe_title safe_desc
+    local safe_title safe_desc safe_repo safe_category
     safe_title=$(sql_escape "$title")
     safe_desc=$(sql_escape "$description")
+    safe_repo=$(sql_escape "$repo")
+    safe_category=$(sql_escape "$category")
 
     db_exec "INSERT INTO nightshift_tasks (run_id, repo, category, title, description, risk_level, llm_tier)
-             VALUES ('$run_id', '$repo', '$category', '$safe_title', '$safe_desc', '$risk_level', '$llm_tier')"
+             VALUES ('$run_id', '$safe_repo', '$safe_category', '$safe_title', '$safe_desc', '$risk_level', '$llm_tier')"
     task_count=$((task_count + 1))
     log "  Task created: [$category] $title ($risk_level)"
   done < <(echo -e "$all_findings")
