@@ -1,5 +1,7 @@
 # Night Shift
 
+[![Part of AgentStack](https://img.shields.io/badge/Part%20of-AgentStack-blue?style=flat-square)](https://github.com/FvdHMBAI/agent-stack)
+
 **Your codebase improves while you sleep.**
 
 Night Shift scans your repositories overnight, finds lint errors, TypeScript issues, security vulnerabilities, and documentation gaps — fixes them automatically, commits each fix to its own branch, and sends you a morning summary. Self-hosted, free, runs with your own LLM.
