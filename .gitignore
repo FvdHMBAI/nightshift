@@ -1,0 +1,6 @@
+*.log
+*.err
+lessons/
+.cache/
+node_modules/
+*.bak*
