@@ -83,7 +83,8 @@ ollama_generate() {
   local prompt="$1"
   local result
   result=$(curl -s --max-time 120 "$OLLAMA_URL" \
-    -d "{\"model\":\"$OLLAMA_MODEL\",\"prompt\":\"$prompt\",\"stream\":false}" \
+    -d "$(jq -n --arg model "$OLLAMA_MODEL" --arg prompt "$prompt" \
+      '{model: $model, prompt: $prompt, stream: false}')" \
     2>/dev/null)
   echo "$result" | python3 -c "import sys,json; print(json.load(sys.stdin).get('response',''))" 2>/dev/null
 }

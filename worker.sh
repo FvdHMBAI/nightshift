@@ -154,7 +154,9 @@ main() {
   local diff_stat
   diff_stat=$(git diff --cached --stat | tail -1)
   git commit -m "nightshift: [$category] $title" --quiet 2>/dev/null
-  git push origin "$branch_name" --quiet 2>/dev/null || true
+  if ! git push origin "$branch_name" --quiet 2>/dev/null; then
+    log "WARNING: git push failed for $branch_name, branch exists only locally"
+  fi
 
   local safe_diff
   safe_diff=$(sql_escape "$diff_stat")
@@ -332,7 +334,10 @@ cleanup_branch() {
   local base_branch="$1"
   local branch_name="$2"
   cd "$(git rev-parse --show-toplevel 2>/dev/null || echo /tmp)" 2>/dev/null || true
-  git checkout "$base_branch" --quiet 2>/dev/null || true
+  if ! git checkout "$base_branch" --quiet 2>/dev/null; then
+    log "WARNING: cleanup could not switch to $base_branch, forcing reset"
+    git checkout -f "$base_branch" --quiet 2>/dev/null || true
+  fi
   git branch -D "$branch_name" 2>/dev/null || true
 }
 
