@@ -290,7 +290,7 @@ if command -v shellcheck &>/dev/null; then
   for script in config.sh coordinator.sh worker.sh summary.sh summary-morning.sh lesson-generator.sh install.sh; do
     TESTS_RUN=$((TESTS_RUN + 1))
     sc_output=$(shellcheck -S warning "$PROJECT_DIR/$script" 2>&1 || true)
-    sc_errors=$(echo "$sc_output" | grep -c "^In " || echo "0")
+    sc_errors=$(echo "$sc_output" | grep -c "^In " || true)
     if [[ "$sc_errors" -eq 0 ]]; then
       TESTS_PASSED=$((TESTS_PASSED + 1))
       echo -e "  ${GREEN}PASS${NC} shellcheck: $script"
