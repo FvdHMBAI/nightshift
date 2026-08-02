@@ -35,9 +35,12 @@ main() {
   log "Ollama: $(curl -s -o /dev/null -w '%{http_code}' http://localhost:11434/api/tags 2>/dev/null || echo 'OFFLINE')"
   log "--- Repo Status ---"
   for rp in "${REPOS[@]}"; do
-    local rn=$(basename "$rp")
-    local rchanges=$(git -C "$rp" status --porcelain 2>/dev/null | wc -l)
-    local rbranch=$(git -C "$rp" branch --show-current 2>/dev/null)
+    local rn
+    rn=$(basename "$rp")
+    local rchanges
+    rchanges=$(git -C "$rp" status --porcelain 2>/dev/null | wc -l)
+    local rbranch
+    rbranch=$(git -C "$rp" branch --show-current 2>/dev/null)
     log "  $rn: Branch=$rbranch, Changes=$rchanges"
   done
   log "---"

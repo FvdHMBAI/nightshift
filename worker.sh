@@ -18,7 +18,7 @@ main() {
     exit 1
   fi
 
-  IFS='|' read -r repo category title description risk_level llm_tier run_id <<< "$task_data"
+  IFS='|' read -r repo category title description _risk_level llm_tier _run_id <<< "$task_data"
 
   # Resolve repo path — supports both basename and absolute path in REPOS
   local repo_path=""
@@ -32,7 +32,8 @@ main() {
     repo_path="$repo"
   fi
 
-  local branch_name="nightshift/${category}-$(date +%Y%m%d)-$(echo "$title" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | head -c 40)"
+  local branch_name
+  branch_name="nightshift/${category}-$(date +%Y%m%d)-$(echo "$title" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | head -c 40)"
 
   log "Worker started: [$category] $title (Repo: $repo)"
   local safe_branch
@@ -73,7 +74,8 @@ main() {
   if ! git rev-parse --verify "$base_branch" &>/dev/null; then
     base_branch="main"
   fi
-  local backup_tag="nightshift-backup/$(date +%Y%m%d-%H%M%S)-${repo}"
+  local backup_tag
+  backup_tag="nightshift-backup/$(date +%Y%m%d-%H%M%S)-${repo}"
   git tag "$backup_tag" "$base_branch" 2>/dev/null || true
 
   # Create branch
