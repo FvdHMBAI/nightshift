@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Night Shift Configuration
+# Night Shift Configuration. Sourced by coordinator.sh, worker.sh, etc.
+# shellcheck disable=SC2034
 # Edit this file to match your environment
 
 # ─── Repositories to scan ───

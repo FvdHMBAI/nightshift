@@ -35,11 +35,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check for non-English strings
         run: |
-          GERMAN=$(grep -rlE 'ä|ö|ü|ß' --include='*.sh' . || true)
+          GERMAN=$(grep -rlP '\xc3[\xa4\xb6\xbc\x9f]' --include='*.sh' --exclude-dir=tests . || true)
           if [[ -n "$GERMAN" ]]; then
             echo "Files with German characters:"
             echo "$GERMAN"
-            grep -rnE 'ä|ö|ü|ß' --include='*.sh' .
+            grep -rnP '\xc3[\xa4\xb6\xbc\x9f]' --include='*.sh' --exclude-dir=tests .
             exit 1
           fi
           echo "All clear — no German strings found."

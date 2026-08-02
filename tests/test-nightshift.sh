@@ -313,7 +313,7 @@ echo "=== Language Check (English only) ==="
 german_found=false
 for script in config.sh coordinator.sh worker.sh summary.sh summary-morning.sh lesson-generator.sh install.sh; do
   TESTS_RUN=$((TESTS_RUN + 1))
-  german_lines=$(grep -cE 'ä|ö|ü|ß' "$PROJECT_DIR/$script" 2>/dev/null | tr -d '[:space:]' || echo "0")
+  german_lines=$(grep -cP '\xc3[\xa4\xb6\xbc\x9f]' "$PROJECT_DIR/$script" 2>/dev/null | tr -d '[:space:]' || echo "0")
   german_lines="${german_lines:-0}"
   if [[ "$german_lines" -eq 0 ]]; then
     TESTS_PASSED=$((TESTS_PASSED + 1))
