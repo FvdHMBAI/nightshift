@@ -55,6 +55,14 @@ log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" | tee -a "${LOG_DIR}/nightshift.log"
 }
 
+sql_escape() {
+  local val="$1"
+  val=$(printf '%s' "$val" | tr -d '\000')
+  val="${val//\\/\\\\}"
+  val="${val//\'/\'\'}"
+  printf '%s' "$val"
+}
+
 db_query() {
   if [[ "$DB_MODE" == "docker" ]] && [[ -n "$DB_CONTAINER" ]]; then
     docker exec "$DB_CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" -t -A -c "$1" 2>/dev/null

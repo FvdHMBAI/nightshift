@@ -85,8 +85,8 @@ main() {
     esac
 
     local safe_title safe_desc
-    safe_title=$(echo "$title" | sed "s/'/''/g")
-    safe_desc=$(echo "$description" | sed "s/'/''/g")
+    safe_title=$(sql_escape "$title")
+    safe_desc=$(sql_escape "$description")
 
     db_exec "INSERT INTO nightshift_tasks (run_id, repo, category, title, description, risk_level, llm_tier)
              VALUES ('$run_id', '$repo', '$category', '$safe_title', '$safe_desc', '$risk_level', '$llm_tier')"
@@ -110,7 +110,7 @@ main() {
   # Clean up old backup tags (older than 7 days)
   for repo_path in "${REPOS[@]}"; do
     if [[ -d "$repo_path/.git" ]]; then
-      git -C "$repo_path" tag -l 'nightshift-backup/*' 2>/dev/null | while read -r tag; do
+      while read -r tag; do
         local tag_date
         tag_date=$(echo "$tag" | grep -oP '\d{8}' | head -1)
         if [[ -n "$tag_date" ]]; then
@@ -122,7 +122,7 @@ main() {
             git -C "$repo_path" tag -d "$tag" 2>/dev/null || true
           fi
         fi
-      done
+      done < <(git -C "$repo_path" tag -l 'nightshift-backup/*' 2>/dev/null)
     fi
   done
 

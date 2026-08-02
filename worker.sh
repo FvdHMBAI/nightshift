@@ -35,7 +35,9 @@ main() {
   local branch_name="nightshift/${category}-$(date +%Y%m%d)-$(echo "$title" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | head -c 40)"
 
   log "Worker started: [$category] $title (Repo: $repo)"
-  db_exec "UPDATE nightshift_tasks SET status = 'running', branch_name = '$branch_name' WHERE id = '$TASK_ID'"
+  local safe_branch
+  safe_branch=$(sql_escape "$branch_name")
+  db_exec "UPDATE nightshift_tasks SET status = 'running', branch_name = '$safe_branch' WHERE id = '$TASK_ID'"
 
   # Skip complex tasks
   if [[ "$llm_tier" == "heavy" ]]; then
@@ -89,7 +91,13 @@ main() {
     exit 1
   }
   trap handle_timeout TERM
-  trap "kill $timeout_pid 2>/dev/null; cleanup_branch '$base_branch' '$branch_name'; $stashed && git stash pop --quiet 2>/dev/null || true" EXIT
+  trap 'kill '"$timeout_pid"' 2>/dev/null || true
+    cleanup_branch "'"$base_branch"'" "'"$branch_name"'" || true
+    if '"$stashed"'; then
+      if ! git stash pop --quiet 2>/dev/null; then
+        log "WARNING: git stash pop failed. Changes saved in stash, recover manually with: git stash list"
+      fi
+    fi' EXIT
 
   # Execute task
   local success=false
@@ -148,7 +156,9 @@ main() {
   git commit -m "nightshift: [$category] $title" --quiet 2>/dev/null
   git push origin "$branch_name" --quiet 2>/dev/null || true
 
-  db_exec "UPDATE nightshift_tasks SET status = 'completed', diff_summary = '$(echo "$diff_stat" | sed "s/'/''/g")', completed_at = NOW() WHERE id = '$TASK_ID'"
+  local safe_diff
+  safe_diff=$(sql_escape "$diff_stat")
+  db_exec "UPDATE nightshift_tasks SET status = 'completed', diff_summary = '$safe_diff', completed_at = NOW() WHERE id = '$TASK_ID'"
   log "Task completed: $diff_stat"
 
   # Generate lesson (Pro feature)
@@ -198,6 +208,16 @@ $file_content")
     local fix_lines
     fix_lines=$(echo "$fix" | wc -l)
     if [[ "$fix_lines" -le 10 ]] && [[ -n "$fix" ]]; then
+      local start_line=$((line_num > 3 ? line_num - 3 : 1))
+      local end_line=$((line_num + 3))
+      local tmp_file
+      tmp_file=$(mktemp)
+      {
+        sed -n "1,$((start_line - 1))p" "$file_path"
+        echo "$fix"
+        sed -n "$((end_line + 1)),\$p" "$file_path"
+      } > "$tmp_file"
+      mv "$tmp_file" "$file_path"
       log "TypeScript fix applied in $file_path:$line_num"
     fi
   done <<< "$errors"
@@ -225,10 +245,24 @@ execute_docs_fix() {
 Current README:
 $current_readme")
 
-    if [[ -n "$new_content" ]] && [[ ${#new_content} -gt ${#current_readme} ]]; then
-      echo "$new_content" > README.md
-      return 0
+    if [[ -z "$new_content" ]]; then
+      return 1
     fi
+    if [[ ${#new_content} -le ${#current_readme} ]]; then
+      log "LLM output shorter than original README, skipping"
+      return 1
+    fi
+    if [[ ${#new_content} -gt 50000 ]]; then
+      log "LLM output too large (${#new_content} bytes), skipping"
+      return 1
+    fi
+    local first_line
+    first_line=$(echo "$new_content" | head -1)
+    if [[ "$first_line" == '```'* ]]; then
+      new_content=$(echo "$new_content" | sed '1d;$d')
+    fi
+    echo "$new_content" > README.md
+    return 0
   fi
   return 1
 }
@@ -283,14 +317,13 @@ execute_security_fix() {
   fi
 
   log "npm audit: vulnerabilities not auto-fixable (semver-major or no fix available)"
-  db_exec "UPDATE nightshift_tasks SET status = 'skipped', error_message = 'Only semver-major fixes available (breaking changes)', completed_at = NOW() WHERE id = '$TASK_ID'"
-  exit 0
+  return 1
 }
 
 fail_task() {
   local error_msg="$1"
   local safe_msg
-  safe_msg=$(echo "$error_msg" | sed "s/'/''/g" | head -c 500)
+  safe_msg=$(sql_escape "$(echo "$error_msg" | head -c 500)")
   db_exec "UPDATE nightshift_tasks SET status = 'failed', error_message = '$safe_msg', completed_at = NOW() WHERE id = '$TASK_ID'"
   log "Task failed: $error_msg"
 }
