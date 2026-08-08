@@ -233,6 +233,23 @@ With Ollama: $0. With Claude API: typically $0.02-0.10 per run depending on find
 **Can I run it manually?**
 Yes: `./coordinator.sh` runs a full cycle. `./summary-morning.sh` generates/sends the summary.
 
+## How It Compares
+
+| | Night Shift | Renovate / Dependabot | CodeRabbit | Devin | Sweep (dead) |
+|---|---|---|---|---|---|
+| **Scope** | Lint + types + security + docs + deps | Dependencies only | Review only (no fixes) | Everything (interactive) | Issue-to-PR |
+| **Runs when** | Overnight (cron) | On dependency update | On PR creation | On demand | On issue creation |
+| **LLM choice** | Ollama (free) or Claude | None (rule-based) | Proprietary | Proprietary | Proprietary |
+| **Self-hosted** | Yes | Partial (GitHub app) | No (SaaS) | No (cloud) | No |
+| **Branch isolation** | Yes (one branch per fix) | Yes | N/A (no changes) | No (works in-place) | Yes |
+| **Auto-rollback** | Yes (tsc fails = revert) | No | N/A | No | No |
+| **Cost** | $0 (Ollama) / ~$0.05/run (Claude) | Free tier | $15/mo+ | $500/mo | Shut down |
+| **Data stays local** | Yes | Partial | No | No | No |
+| **Verification** | TypeScript + build check | CI pipeline | None | Manual review | CI pipeline |
+| **Lesson generation** | Yes (Pro: explains WHY) | No | No | No | No |
+
+**Different category.** Renovate and Dependabot handle one slice (dependency updates). CodeRabbit reviews but never fixes. Devin is a full interactive agent ($500/mo). Night Shift covers the boring maintenance layer between those tools: lint, types, security, docs. It runs unattended, on your hardware, with your LLM, and every fix is isolated on its own branch.
+
 ## Part of AgentStack
 
 This tool is free and always will be. For teams that need the full governance stack (GuardRail Pro + Compliance Shield + priority support), see [AgentStack Pro](https://github.com/FvdHMBAI/agent-stack/blob/main/BUNDLE.md) (EUR 79/dev/month).
