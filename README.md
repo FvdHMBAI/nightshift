@@ -1,10 +1,10 @@
-<h1 align="center">
-  <br>
-  <img src="https://img.shields.io/badge/%F0%9F%8C%99-Night%20Shift-blue?style=for-the-badge&labelColor=0d1117&color=8b5cf6" alt="Night Shift" height="40">
-  <br>
-  Your codebase improves while you sleep.
-  <br>
-</h1>
+<p align="center">
+  <img src=".github/assets/banner.svg" alt="Night Shift - Your codebase improves while you sleep" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://github.com/FvdHMBAI/agent-stack"><img src="https://img.shields.io/badge/Part%20of-AgentStack-blue?style=flat-square" alt="Part of AgentStack"></a>
+</p>
 
 <p align="center">
   <a href="https://github.com/FvdHMBAI/nightshift/actions"><img src="https://github.com/FvdHMBAI/nightshift/actions/workflows/ci.yml/badge.svg" alt="CI"></a>&nbsp;
@@ -13,39 +13,22 @@
 </p>
 
 <p align="center">
-  <a href="#the-story">Story</a> · 
-  <a href="#quick-start">Quick Start</a> · 
-  <a href="#how-it-compares">Comparison</a> · 
-  <a href="#what-it-fixes">What It Fixes</a> · 
-  <a href="#architecture">Architecture</a> · 
-  <a href="#the-agentstack-ecosystem">Ecosystem</a>
+  <a href="#quick-start">Quick Start</a> ·
+  <a href="#what-it-fixes">What It Fixes</a> ·
+  <a href="#how-it-compares">Comparison</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#agentstack-ecosystem">Ecosystem</a>
 </p>
 
 ---
 
-## The Story
+I used to start every Monday reviewing the same lint errors, the same type mismatches, the same outdated dependencies. Now I wake up to a branch per fix, each one verified, each one ready to merge.
 
-Every Monday morning, the same feeling: 14 ESLint warnings, 3 TypeScript errors nobody owns, two `npm audit` findings from last week's dependency bump. Not urgent enough to fix during a sprint. Too annoying to ignore.
+Night Shift turned Monday mornings from cleanup into code review.
 
-So we built a cron job that fixes them overnight.
+It scans your repositories overnight, finds lint errors, TypeScript issues, security vulnerabilities, and documentation gaps. Fixes them automatically. Commits each fix to its own branch. Sends you a morning summary. Self-hosted, free, runs with your own LLM.
 
-Night Shift scans your repositories while you sleep. It finds lint errors, TypeScript issues, security vulnerabilities, and documentation gaps. It fixes them automatically, commits each fix to its own branch, and sends you a morning summary. You review. You merge. You move on to the work that matters.
-
-No SaaS account. No cloud dependency. Your LLM, your server, your code.
-
-```
-  ┌──────────────────────────────────────────────────────────────┐
-  │  Morning Summary: Night Shift Run #247                       │
-  │                                                              │
-  │  Scanned: 5 repos                                            │
-  │  Fixed:   12 issues (4 lint, 3 types, 2 security, 3 docs)   │
-  │  Branches: 12 ready for review                               │
-  │  Duration: 23 minutes                                        │
-  │  Cost:     EUR 0.00 (Ollama local)                           │
-  │                                                              │
-  │  ✓ All fixes verified. No regressions detected.              │
-  └──────────────────────────────────────────────────────────────┘
-```
+---
 
 <p align="center">
   <img src="demo/demo.gif" alt="Night Shift Demo" width="700">
@@ -53,61 +36,52 @@ No SaaS account. No cloud dependency. Your LLM, your server, your code.
 
 ---
 
-<table>
-  <tr>
-    <td align="center"><strong>225</strong><br><sub>Cron Jobs in Production</sub></td>
-    <td align="center"><strong>81</strong><br><sub>Containers Monitored</sub></td>
-    <td align="center"><strong>1,048</strong><br><sub>Autonomous Tasks Completed</sub></td>
-    <td align="center"><strong>89%</strong><br><sub>Success Rate</sub></td>
-  </tr>
-</table>
+## Morning Summary
 
-<p align="center"><sub>Numbers from a live system running 13 applications. Night Shift is one of 225 automated jobs.</sub></p>
+This is what arrives on your phone before your first coffee:
+
+```
+ Night Shift Run Complete
+ 2026-08-07 | 5 repos | 22:00 - 02:47
+
+ FIXED (12 branches ready to merge)
+   my-frontend
+     nightshift/lint-fix-no-unused-vars        eslint --fix
+     nightshift/type-fix-missing-null-check     LLM patch + tsc verified
+     nightshift/deps-update-minor-patch         npm update (13 packages)
+
+   my-api
+     nightshift/lint-fix-prefer-const           eslint --fix
+     nightshift/security-fix-express-4.19       npm audit fix + build OK
+     nightshift/type-fix-async-return           LLM patch + tsc verified
+     nightshift/docs-expand-readme              24 lines -> 89 lines
+
+   my-backend
+     nightshift/lint-fix-unused-imports         eslint --fix
+     nightshift/type-fix-optional-chain         LLM patch + tsc verified
+     nightshift/security-fix-jsonwebtoken       npm audit fix + build OK
+
+   shared-lib
+     nightshift/lint-fix-consistent-return      eslint --fix
+     nightshift/deps-update-minor-patch         npm update (7 packages)
+
+ ROLLED BACK (2 tasks)
+     my-frontend  type-fix-complex-generic     tsc failed after patch
+     my-api       deps-update-major            build broke, reverted
+
+ STATS
+   Tasks created:   14
+   Tasks completed: 12 (85.7%)
+   Tasks failed:     2 (auto-rolled back)
+   LLM tokens used: 23,400 (Ollama qwen3:8b, $0.00)
+   Duration:         4h 47m
+```
+
+Every branch is isolated. Nothing touches your working code. You review, you merge, you move on.
 
 ---
 
-## Quick Start
-
-### Prerequisites
-
-- bash 4+, jq, git
-- Node.js 18+ (for the repos you want to scan)
-- One of: Ollama (free), Claude API key, or OpenAI API key
-
-### Install
-
-```bash
-git clone https://github.com/FvdHMBAI/nightshift.git
-cd nightshift && ./install.sh
-```
-
-### Configure
-
-```bash
-nightshift init
-# Creates ~/.nightshift/config.json with sensible defaults
-```
-
-Add your repos:
-
-```bash
-nightshift add /home/developer/my-project
-nightshift add /home/developer/another-project
-```
-
-### Run
-
-```bash
-# Manual run (foreground)
-nightshift run
-
-# Schedule nightly at 2 AM
-nightshift schedule 02:00
-```
-
-That's it. Tomorrow morning you'll have branches ready for review.
-
-## How It Compares
+## Why Night Shift?
 
 | | Night Shift | Devin | CodeRabbit | Sweep (dead) |
 |---|---|---|---|---|
@@ -121,7 +95,9 @@ That's it. Tomorrow morning you'll have branches ready for review.
 
 **Night Shift is not trying to be Devin.** It handles the boring, repetitive maintenance that piles up. The kind of work nobody wants to do but everybody benefits from. It runs when you sleep, uses your own LLM, and every fix lands on its own branch for you to review.
 
-## What It Fixes
+---
+
+## What it fixes
 
 | Category | Detection | Fix method | Verification |
 |----------|-----------|------------|--------------|
@@ -132,6 +108,10 @@ That's it. Tomorrow morning you'll have branches ready for review.
 | **Deps** | `npm outdated` | `npm update` (minor/patch only) | TypeScript + Next.js build |
 
 Every fix runs on its own branch (`nightshift/lint-fix-20260801-eslint-no-unused-vars`), so you always review before merging.
+
+---
+
+<a id="architecture"></a>
 
 ## Architecture
 
@@ -147,11 +127,11 @@ Every fix runs on its own branch (`nightshift/lint-fix-20260801-eslint-no-unused
   ┌─────────────────────┐              ┌─────────────────────────┐
   │   SCANNER (per repo) │              │   WORKER POOL (parallel) │
   │                      │              │                          │
-  │  ESLint errors       │   tasks      │  Worker 1: lint-fix      │
-  │  TypeScript issues   │────────▶     │  Worker 2: security      │
-  │  npm audit           │   (DB)       │  Worker 3: type-fix      │
-  │  Missing tests       │              │                          │
-  │  Thin docs           │              │  Each worker:            │
+  │  • ESLint errors     │   tasks      │  Worker 1: lint-fix      │
+  │  • TypeScript issues │──────────▶   │  Worker 2: security      │
+  │  • npm audit         │   (DB)       │  Worker 3: type-fix      │
+  │  • Missing tests     │              │                          │
+  │  • Thin docs         │              │  Each worker:            │
   └──────────────────────┘              │  1. Create branch        │
                                         │  2. Apply fix            │
                                         │  3. Verify (tsc)         │
@@ -164,89 +144,194 @@ Every fix runs on its own branch (`nightshift/lint-fix-20260801-eslint-no-unused
   ┌─────────────────────┐     ┌─────────────────────┐
   │   LESSON GENERATOR   │     │    MORNING SUMMARY   │
   │  (optional, Pro)     │     │                      │
-  │                      │     │  ntfy notification   │
-  │  Explains the WHY    │     │  DB summary record   │
-  │  behind each fix     │     │  Run statistics      │
+  │                      │     │  • ntfy notification  │
+  │  Explains the WHY    │     │  • DB summary record  │
+  │  behind each fix     │     │  • Run statistics     │
   └──────────────────────┘     └──────────────────────┘
 ```
 
-Each scanner detects issues. Each worker fixes one issue on a dedicated branch. If the fix breaks the build, the worker rolls back automatically. No partial fixes, no broken code.
+### Safety guarantees
 
-## Safety First
+1. **Branch isolation.** Every fix gets its own branch. Your main/develop is never touched.
+2. **Backup tags.** Created before any changes, recoverable with `git tag -l 'nightshift-backup/*'`.
+3. **Compilation verification.** TypeScript check after every npm change. Breaks? Automatic rollback.
+4. **Stash protection.** Uncommitted work is stashed before, restored after.
+5. **RAM monitoring.** Stops spawning workers if memory drops below threshold.
+6. **Task timeout.** 2-hour default prevents runaway processes.
+7. **Lockfile.** Prevents concurrent coordinator runs.
+8. **Risk classification.** High-risk tasks are flagged, complex ones deferred to a stronger model.
 
-Night Shift never pushes to your main branch. Every fix gets its own branch, its own commit message, and its own verification step. You review, you merge, you stay in control.
+---
 
-Built-in safety checks:
-- **RAM check** before starting (skips run if memory is low)
-- **Branch isolation** (one branch per fix, never touches main)
-- **Auto-rollback** (if TypeScript or build fails after fix, the branch is deleted)
-- **Dry-run mode** (`nightshift run --dry-run` shows what would change without touching code)
+## Quick Start
 
-Works with [GuardRail](https://github.com/FvdHMBAI/guardrail) for defense in depth. GuardRail blocks dangerous commands. Night Shift only runs safe, predefined operations.
+### Prerequisites
 
-## Configuration
+- **Linux** with bash 4+, curl, jq, python3
+- **PostgreSQL 13+** for task tracking
+- **Ollama** (recommended) or Anthropic API key for LLM analysis
+- **Node.js** repos with ESLint / TypeScript
 
-Edit `~/.nightshift/config.json`:
-
-```json
-{
-  "repos": [
-    "/home/developer/my-project",
-    "/home/developer/another-project"
-  ],
-  "schedule": "02:00",
-  "model_tier": "local",
-  "max_workers": 3,
-  "categories": ["lint", "types", "security", "docs"],
-  "notify": {
-    "ntfy": "https://ntfy.sh/my-nightshift-channel"
-  }
-}
-```
-
-## CLI
+### Install
 
 ```bash
-nightshift run              # Run now (foreground)
-nightshift run --dry-run    # Show what would change
-nightshift schedule 02:00   # Set nightly schedule
-nightshift add /path/repo   # Add a repository
-nightshift remove /path     # Remove a repository
-nightshift status           # Show last run summary
-nightshift logs             # View run history
+git clone https://github.com/FvdHMBAI/nightshift.git
+cd nightshift
+
+# 1. Configure
+cp config.sh config.local.sh
+vim config.local.sh             # add repos, DB connection, LLM
+
+# 2. Install (creates tables, cron jobs, checks deps)
+./install.sh
+
+# 3. Test run
+./coordinator.sh
 ```
 
-## LLM Support
+### Configuration
 
-Night Shift routes models through [Model Router](https://github.com/FvdHMBAI/model-router) when available. Without it, direct provider support:
+Edit `config.sh` (or create `config.local.sh` that sources and overrides it):
 
-| Provider | Model | Cost | Best for |
-|----------|-------|------|----------|
-| **Ollama** | qwen3:8b | Free | Type fixes, doc generation |
-| **Anthropic** | Claude Sonnet | ~$0.01/fix | Complex type errors |
-| **OpenAI** | GPT-4o | ~$0.01/fix | Alternative provider |
+```bash
+# Repositories to scan (absolute paths)
+REPOS=(
+  "$HOME/projects/my-frontend"
+  "$HOME/projects/my-api"
+  "$HOME/projects/my-backend"
+)
 
-Default is Ollama. Your code never leaves your machine.
+# Database
+DB_MODE="postgres"
+DB_URL="postgresql://user:pass@localhost:5432/nightshift"
 
-## The AgentStack Ecosystem
+# LLM: Ollama is default (free, local)
+OLLAMA_MODEL="qwen3:8b"
+# ANTHROPIC_API_KEY="sk-ant-..."   # optional: better type/doc fixes
 
-Night Shift is one of five open-source tools for AI governance:
+# Limits
+MAX_TASKS=15
+MAX_WORKERS=3
+MAX_TASK_DURATION=7200              # 2h timeout per task
+MIN_FREE_RAM_MB=3072                # abort if < 3GB free
 
-| Tool | What it does |
-|---|---|
-| **[GuardRail](https://github.com/FvdHMBAI/guardrail)** | Pre-execution security. 172 guards, 96% enforcement rate. |
-| **[Model Router](https://github.com/FvdHMBAI/model-router)** | Shell-native LLM routing. One config, every model. |
-| **Night Shift** | Overnight code improvement (you are here). |
-| **[Graphify Toolkit](https://github.com/FvdHMBAI/graphify-toolkit)** | Turn any codebase into a queryable knowledge graph. |
-| **[Autonomie OS](https://github.com/FvdHMBAI/autonomie-os)** | Self-improving agent framework. Learns from every session. |
+# Notifications (ntfy.sh compatible)
+# NTFY_URL="https://ntfy.sh/my-nightshift"
+```
 
-Each tool works standalone. Together, they form a governance layer for AI-assisted development.
+---
 
-**Learn the principles behind this stack:** [18 free lessons on KI-Governance](https://lernen.promptandbuild.de)
+## How it works
 
-## Contributing
+```
+22:00  Coordinator starts
+       ├── Check RAM, create run record
+       ├── For each repo:
+       │   ├── git fetch origin develop
+       │   ├── ESLint scan
+       │   ├── TypeScript scan
+       │   ├── npm audit
+       │   ├── Test coverage check
+       │   └── README length check
+       │
+       ├── Classify findings into tasks (low/medium/high risk)
+       │
+       ├── Run workers (up to 3 parallel):
+       │   ├── Create nightshift/* branch
+       │   ├── Apply fix
+       │   ├── Verify (tsc --noEmit, build check)
+       │   ├── If broken: rollback, mark failed
+       │   ├── If clean: commit, push, mark completed
+       │   └── Generate lesson (optional)
+       │
+       └── Generate summary, send to DB + ntfy
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Browse [good first issues](https://github.com/FvdHMBAI/nightshift/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+06:00  Morning summary (catches any unfinished runs)
+```
+
+---
+
+## Lesson Generator (Pro)
+
+Every completed fix generates a learning lesson explaining the programming concept behind the change. Not just what was fixed, but why it matters. Stored in the database with topic, difficulty, code before/after, and exercises.
+
+Works best with an Anthropic API key but falls back to Ollama.
+
+---
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NIGHTSHIFT_DB_URL` | `postgresql://...localhost:5432/nightshift` | PostgreSQL connection |
+| `NIGHTSHIFT_DB_MODE` | `postgres` | `postgres` or `docker` |
+| `NIGHTSHIFT_DB_CONTAINER` | n/a | Docker container (if mode=docker) |
+| `NIGHTSHIFT_DB_NAME` | `nightshift` | Database name (docker mode) |
+| `NIGHTSHIFT_DB_USER` | `postgres` | Database user (docker mode) |
+| `OLLAMA_URL` | `http://localhost:11434/api/generate` | Ollama endpoint |
+| `OLLAMA_MODEL` | `qwen3:8b` | Local LLM model |
+| `ANTHROPIC_API_KEY` | n/a | Claude API (optional, Pro features) |
+| `NIGHTSHIFT_CLAUDE_MODEL` | `claude-sonnet-4-6` | Claude model |
+| `NIGHTSHIFT_NTFY_URL` | n/a | ntfy.sh notification URL |
+| `NIGHTSHIFT_LOG_DIR` | `/var/log/nightshift` | Log directory |
+| `NIGHTSHIFT_LESSON_DIR` | `./lessons` | Lesson output directory |
+
+---
+
+## Extending Night Shift
+
+Add custom task categories by:
+
+1. Adding a scanner in `coordinator.sh` that outputs `repo|category|title|description`
+2. Adding a handler in `worker.sh` with a `case "$category"` branch
+3. That's it. The coordinator/worker/summary pipeline handles the rest.
+
+---
+
+## FAQ
+
+**Can it break my code?**
+Every fix runs on its own branch. If TypeScript compilation fails after a fix, the change is rolled back automatically. Your working branches are never modified.
+
+**Does it support monorepos?**
+Yes. Add the monorepo root to `REPOS`. The scanner checks for ESLint, TypeScript, and npm audit at the configured paths.
+
+**What LLMs does it support?**
+Any Ollama model (local, free) or Anthropic Claude (cloud, paid). The TypeScript fixer and doc generator use the LLM. Lint and security fixes are deterministic tools.
+
+**How much does it cost to run?**
+With Ollama: $0. With Claude API: typically $0.02-0.10 per run depending on findings. The system logs token usage per task.
+
+**Can I run it manually?**
+Yes: `./coordinator.sh` runs a full cycle. `./summary-morning.sh` generates/sends the summary.
+
+---
+
+<a id="agentstack-ecosystem"></a>
+
+## AgentStack Ecosystem
+
+Night Shift is one piece of a complete AI operations stack. Each tool solves one problem well:
+
+| Tool | What it does | Link |
+|------|-------------|------|
+| **[GuardRail](https://github.com/FvdHMBAI/guardrail)** | Pre-execution security for AI agents. Blocks dangerous commands before they run. | [Repo](https://github.com/FvdHMBAI/guardrail) |
+| **[Model Router](https://github.com/FvdHMBAI/model-router)** | Shell-native LLM routing. One config, every model, zero dependencies. | [Repo](https://github.com/FvdHMBAI/model-router) |
+| **Night Shift** | Overnight codebase maintenance. You are here. | |
+| **[Graphify Toolkit](https://github.com/FvdHMBAI/graphify-toolkit)** | Turn any codebase into a queryable knowledge graph. | [Repo](https://github.com/FvdHMBAI/graphify-toolkit) |
+| **[Autonomie OS](https://github.com/FvdHMBAI/autonomie-os)** | Self-improving AI agent framework. Learns from every session. | [Repo](https://github.com/FvdHMBAI/autonomie-os) |
+
+All five tools are open source, self-hosted, and work together. GuardRail protects. Model Router picks the right model. Night Shift maintains the code. Graphify maps the architecture. Autonomie OS makes agents smarter over time.
+
+---
+
+## Learn More
+
+Want to understand how these tools fit into a complete AI governance strategy? The free course covers guard design, model routing, autonomous operations, and more:
+
+**[KI-Governance Kurs](https://lernen.promptandbuild.de)** (18 lessons, free)
+
+---
 
 ## License
 
@@ -255,6 +340,9 @@ MIT. See [LICENSE](LICENSE).
 ---
 
 <p align="center">
-  Built by <a href="https://promptandbuild.de">Prompt & Build</a>.<br>
-  Part of <a href="https://github.com/FvdHMBAI/agent-stack">AgentStack</a>: the complete governance layer for AI agents.
+  Built by <a href="https://promptandbuild.de">Prompt & Build</a>.
+</p>
+
+<p align="center">
+  If Night Shift saves you maintenance time, consider giving it a <a href="https://github.com/FvdHMBAI/nightshift">star</a>. It helps others find it.
 </p>
