@@ -8,6 +8,11 @@ Night Shift scans your repositories overnight, finds lint errors, TypeScript iss
 
 [![CI](https://github.com/FvdHMBAI/nightshift/actions/workflows/ci.yml/badge.svg)](https://github.com/FvdHMBAI/nightshift/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/FvdHMBAI/nightshift?style=social)](https://github.com/FvdHMBAI/nightshift/stargazers)
+
+<p align="center">
+  <img src="demo/demo.gif" alt="Night Shift Demo" width="700">
+</p>
 
 ```
                          Night Shift Architecture
