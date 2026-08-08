@@ -233,6 +233,10 @@ With Ollama: $0. With Claude API: typically $0.02-0.10 per run depending on find
 **Can I run it manually?**
 Yes: `./coordinator.sh` runs a full cycle. `./summary-morning.sh` generates/sends the summary.
 
+## Part of AgentStack
+
+This tool is free and always will be. For teams that need the full governance stack (GuardRail Pro + Compliance Shield + priority support), see [AgentStack Pro](https://github.com/FvdHMBAI/agent-stack/blob/main/BUNDLE.md) (EUR 79/dev/month).
+
 ## License
 
 MIT — see [LICENSE](LICENSE)
