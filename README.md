@@ -239,4 +239,8 @@ MIT — see [LICENSE](LICENSE)
 
 ---
 
-Built by [Prompt & Build](https://promptandbuild.de) — running 13+ SaaS products with AI agents.
+Built by [Prompt & Build](https://promptandbuild.de). Running 13+ SaaS products with AI agents.
+
+<p align="center">
+  If Night Shift saves you maintenance time, consider giving it a <a href="https://github.com/FvdHMBAI/nightshift">star</a>. It helps others find it.
+</p>
